@@ -28,33 +28,41 @@ export const addToCart = (id) => {
     // update values
     const amount = increaseAmount(id);
     const items = [...cartItemsDOM.querySelectorAll('.cart-item-amount')];
-    console.log(items);
+    const newAmount = items.find((value) => value.dataset.id === id);
+    newAmount.textContent = amount;
   }
   // add one to the item count
-  discplayCartItemCount();
+  displayCartItemCount();
   // display cart totals
-  discplayCartTotal();
+  displayCartTotal();
   // set cart in local storage
   setStorageItem('cart', cart);
   // more stuff coming up
   openCart();
 };
 
-function discplayCartItemCount() {
+function displayCartItemCount() {
   const amount = cart.reduce((total, cartItem) => {
     return (total += cartItem.amount);
   }, 0);
   cartItemCountDOM.textContent = amount;
 }
 
-function discplayCartTotal() {
+function displayCartTotal() {
   let total = cart.reduce((total, cartItem) => {
     return (total += cartItem.price * cartItem.amount);
   }, 0);
   cartTotalDOM.textContent = `Total : ${formatPrice(total)}`;
+  // console.log(cartItem);
 }
 function displayCartItemsDOM() {
-  cart.forEach((cartItem) => addToCartDOM(cartItem));
+  cart.forEach((cartItem) => {
+    addToCartDOM(cartItem);
+  });
+}
+
+function removeItem(id) {
+  cart = cart.filter((cartItem) => cartItem.id !== id);
 }
 
 function increaseAmount(id) {
@@ -62,20 +70,37 @@ function increaseAmount(id) {
   cart = cart.map((cartItem) => {
     if (cartItem.id === id) {
       newAmount = cartItem.amount + 1;
-      cartItem = { ...cart, amount: newAmount };
+      cartItem = { ...cartItem, amount: newAmount };
     }
     return cartItem;
   });
   return newAmount;
 }
 
-function setupCartFunctionality() {}
+function setupCartFunctionality() {
+  cartItemsDOM.addEventListener('click', function (e) {
+    const element = e.target;
+    const parent = e.target.parentElement;
+    const id = e.target.dataset.id;
+    const parentID = e.target.parentElement.dataset.id;
+    // remove
+    if (element.classList.contains('cart-item-remove-btn')) {
+      removeItem(id);
+      parent.parentElement.remove();
+    }
+    // increase
+    // decrease
+    displayCartItemCount();
+    displayCartTotal();
+    setStorageItem('cart', cart);
+  });
+}
 
 const init = () => {
   // display amount of cart items
-  discplayCartItemCount();
+  displayCartItemCount();
   // display total
-  discplayCartTotal();
+  displayCartTotal();
   // add all cart items to the DOM
   displayCartItemsDOM();
   // setup cart functionality
