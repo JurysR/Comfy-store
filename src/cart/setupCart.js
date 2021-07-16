@@ -10,7 +10,7 @@ import { findProduct } from '../store.js';
 import addToCartDOM from './addToCartDOM.js';
 // set items
 const cartItemCountDOM = getElement('.cart-item-count');
-const cartImensDOM = getElement('.cart-items');
+const cartItemsDOM = getElement('.cart-items');
 const cartTotalDOM = getElement('.cart-total');
 
 let cart = getStorageItem('cart');
@@ -24,9 +24,11 @@ export const addToCart = (id) => {
     cart = [...cart, product];
     // add item to the DOM
     addToCartDOM(product);
-    console.log(cart);
   } else {
     // update values
+    const amount = increaseAmount(id);
+    const items = [...cartItemsDOM.querySelectorAll('.cart-item-amount')];
+    console.log(items);
   }
   // add one to the item count
   discplayCartItemCount();
@@ -54,6 +56,19 @@ function discplayCartTotal() {
 function displayCartItemsDOM() {
   cart.forEach((cartItem) => addToCartDOM(cartItem));
 }
+
+function increaseAmount(id) {
+  let newAmount;
+  cart = cart.map((cartItem) => {
+    if (cartItem.id === id) {
+      newAmount = cartItem.amount + 1;
+      cartItem = { ...cart, amount: newAmount };
+    }
+    return cartItem;
+  });
+  return newAmount;
+}
+
 function setupCartFunctionality() {}
 
 const init = () => {
@@ -65,6 +80,5 @@ const init = () => {
   displayCartItemsDOM();
   // setup cart functionality
   setupCartFunctionality();
-  console.log(cart);
 };
 init();
